@@ -2,6 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace EloLesekopieDecoding
 {
@@ -48,7 +51,15 @@ namespace EloLesekopieDecoding
         {
             CreateArchiveTopLevelFolder();
 
-            new FolderConverter(_sourceDirectory, _exportDir).ProcessFolder();
+            var xmlFolderStructure = new XDocument(new XElement("ecoDMSFolders"));
+            var currentNode = xmlFolderStructure.Root;
+            
+            new FolderConverter(_sourceDirectory, _exportDir, currentNode).ProcessFolder();
+
+            using (var textWriter = new XmlTextWriter(_targetDirectory + "\\" + "ecoFolders.xml", Encoding.UTF8))
+            {
+                xmlFolderStructure.Save(textWriter);
+            }
         }
 
 
